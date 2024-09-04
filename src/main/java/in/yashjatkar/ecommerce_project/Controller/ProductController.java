@@ -52,4 +52,13 @@ public class ProductController {
         );
 
     }
+
+    @GetMapping("/categories")
+    public List<String> getAllCategory()
+    {
+        return productService.getAllCategory();
+    }
+
+
 }
+

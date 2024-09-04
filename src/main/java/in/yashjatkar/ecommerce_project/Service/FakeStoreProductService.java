@@ -1,13 +1,12 @@
 package in.yashjatkar.ecommerce_project.Service;
 
 import in.yashjatkar.ecommerce_project.Dto.FakeStoreDto;
-import in.yashjatkar.ecommerce_project.Model.Category;
 import in.yashjatkar.ecommerce_project.Model.Product;
 import org.springframework.stereotype.Service;
-import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.client.RestTemplate;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 
@@ -43,22 +42,39 @@ public class FakeStoreProductService implements ProductService{
 
     @Override
     public Product CreateProduct(Long id, String title,Double price, String description,
-                                 String image, String category){
-            FakeStoreDto fakeStoreDto=new FakeStoreDto();
-            fakeStoreDto.setId(id);
+                                 String image, String category) {
+        FakeStoreDto fakeStoreDto = new FakeStoreDto();
+        fakeStoreDto.setId(id);
         fakeStoreDto.setTitle(title);
         fakeStoreDto.setPrice(price);
         fakeStoreDto.setDescription(description);
         fakeStoreDto.setImage(image);
         fakeStoreDto.setCategory(category);
 
-        FakeStoreDto response=
+        FakeStoreDto response =
                 restTemplate.postForObject(
                         "https://fakestoreapi.com/products",//fakeStoreurl for create product
-                        fakeStoreDto , //object to be inserted
+                        fakeStoreDto, //object to be inserted
                         FakeStoreDto.class   //convert json response to this class format
                 );
         return response.convertToProduct();
     }
+//---------------------------------------------------------------------------------------
+public List<String> getAllCategory() {
+    // Fetch the category names from the external API
+    String[] categoryNames = restTemplate.getForObject(
+            "https://fakestoreapi.com/products/categories",
+            String[].class
+    );
+
+    // Convert the array to a List
+    return Arrays.asList(categoryNames);
+}
+//-------------------------------------------------------------------------------------------
+
+
+
+
+
 
 }
