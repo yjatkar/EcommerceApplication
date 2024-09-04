@@ -42,7 +42,7 @@ public class ProductController {
     public Product CreateProduct(@RequestBody CreateProductDto requestDto)
     {
         return productService.CreateProduct(
-            requestDto.getId(),
+
                 requestDto.getTitle(),
                 requestDto.getPrice(),
                 requestDto.getDescription(),
@@ -60,8 +60,6 @@ public class ProductController {
     }
 
 //    fetch('https://fakestoreapi.com/products/category/jewelery')
-//            .then(res=>res.json())
-//            .then(json=>console.log(json))
     //get All Products related to Specific Category
     @GetMapping("/category/{title}")
     public List<Product> getAllProductsForCategory(@PathVariable("title")
@@ -69,6 +67,30 @@ public class ProductController {
     {
         return productService.getAllProductsForCategory(title);
     }
+
+//    Update a product
+//    fetch('https://fakestoreapi.com/products/7')
+    @PatchMapping("/{id}")
+    public Product updateProduct(@RequestBody CreateProductDto createProductDto,
+                                 @PathVariable("id") Long id)
+    {
+//        return productService.updateProduct(
+//                createProductDto.getTitle(),
+//                createProductDto.getPrice(),
+//                createProductDto.getDescription(),
+//                createProductDto.getImage(),
+//                createProductDto.getCategory(),
+//                id);
+        return productService.updateProduct(
+                createProductDto.getTitle(),
+                createProductDto.getPrice(),
+                createProductDto.getDescription(),
+                createProductDto.getCategory(),
+                createProductDto.getImage(),
+                id
+        );
+    }
+
 
 }
 

@@ -3,6 +3,7 @@ package in.yashjatkar.ecommerce_project.Service;
 import in.yashjatkar.ecommerce_project.Dto.FakeStoreDto;
 import in.yashjatkar.ecommerce_project.Model.Product;
 import org.springframework.stereotype.Service;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.client.RestTemplate;
 
 import java.util.ArrayList;
@@ -41,10 +42,9 @@ public class FakeStoreProductService implements ProductService{
     }
 
     @Override
-    public Product CreateProduct(Long id, String title,Double price, String description,
+    public Product CreateProduct(String title,Double price, String description,
                                  String image, String category) {
         FakeStoreDto fakeStoreDto = new FakeStoreDto();
-        fakeStoreDto.setId(id);
         fakeStoreDto.setTitle(title);
         fakeStoreDto.setPrice(price);
         fakeStoreDto.setDescription(description);
@@ -88,6 +88,38 @@ public List<String> getAllCategory() {
 
 
     }
+    public Product updateProduct(String title,Double price,String description,
+                                 String category,String image,Long id)
+    {
+        FakeStoreDto fakeStoreDto=
+                restTemplate.getForObject("https://fakestoreapi.com/products/"+id,
+                        FakeStoreDto.class);
+        if (fakeStoreDto == null) {
+            throw new RuntimeException("Product not found with id: " + id+"try id less than 20");
+        }
+        if(title!=null)
+        {
+              fakeStoreDto.setTitle(title);
+        }
+        if(price!=null)
+        {
+            fakeStoreDto.setPrice(price);
+        }
+        if(description!=null)
+        {
+            fakeStoreDto.setDescription(description);
+        }
+        if(category!=null)
+        {
+            fakeStoreDto.setCategory(category);
+        }
+        if(image!=null)
+        {
+            fakeStoreDto.setImage(image);
+        }
+        return fakeStoreDto.convertToProduct();
+    }
+
 
 
 

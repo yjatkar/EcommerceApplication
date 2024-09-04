@@ -10,7 +10,7 @@ public interface ProductService {
 
     public Product getSingleProduct(Long id);
     public List<Product> getAllProducts();
-    public Product CreateProduct(Long id,
+    public Product CreateProduct(
                                  String title,
                                  Double price,
                                  String description,
@@ -18,4 +18,10 @@ public interface ProductService {
                                  String category);
 public List<String> getAllCategory();
     public List<Product> getAllProductsForCategory(String title);
+    public Product updateProduct(String title,
+                                 Double price,
+                                 String description,
+                                 String category,
+                                 String image,
+                                 Long id);
 }
