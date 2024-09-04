@@ -7,6 +7,8 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import java.util.List;
+
 @RestController//i.e this is not normal controller but take rest requests
 @RequestMapping("/products")
 public class ProductController {
@@ -20,4 +22,12 @@ public class ProductController {
     {
         return productService.getSingleProduct(id);
     }
+
+    //get All products
+    @GetMapping()
+    public List<Product> getAllProducts()
+    {
+        return productService.getAllProducts();
+    }
+
 }
