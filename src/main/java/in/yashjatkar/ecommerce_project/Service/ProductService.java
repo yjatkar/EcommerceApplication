@@ -24,4 +24,6 @@ public List<String> getAllCategory();
                                  String category,
                                  String image,
                                  Long id);
+
+    public void deleteProduct(Long id);
 }

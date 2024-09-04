@@ -2,8 +2,10 @@ package in.yashjatkar.ecommerce_project.Service;
 
 import in.yashjatkar.ecommerce_project.Dto.FakeStoreDto;
 import in.yashjatkar.ecommerce_project.Model.Product;
+import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.client.HttpClientErrorException;
 import org.springframework.web.client.RestTemplate;
 
 import java.util.ArrayList;
@@ -120,7 +122,53 @@ public List<String> getAllCategory() {
         return fakeStoreDto.convertToProduct();
     }
 
+    public void deleteProduct(Long id){
+            restTemplate.delete("https://fakestoreapi.com/products/"+id);
 
+    }
+// ------------------------------------------------------------------------------
+//public void deleteProduct(Long id) {
+//    // URL to access the product
+//    String url = "https://fakestoreapi.com/products/" + id;
+////    restTemplate.delete(url);
+//    try {
+//        // Perform the DELETE request to remove the product from the external API
+//        restTemplate.delete(url);
+//
+//        // Verify if the product was deleted
+//        try {
+//            // Attempt to retrieve the product
+//            FakeStoreDto fakeStoreDto = restTemplate.getForObject(url, FakeStoreDto.class);
+//            if (fakeStoreDto != null) {
+//                throw new RuntimeException("Product deletion failed, product still exists.");
+//            }
+//        }
+//        catch (HttpClientErrorException.NotFound e) {
+////HttpClientErrorException.NotFound is a specific exception in the Spring Framework's
+////RestTemplate that indicates a 404 Not Found HTTP status response from a web service.
+//            // Product was not found, which means it was successfully deleted
+//            // You can log this if needed
+//            System.out.println("Product successfully deleted.");
+//        }
+//
+//    }
+//    catch (HttpClientErrorException e) {
+//        // Handle other HTTP errors
+//        if (e.getStatusCode() == HttpStatus.NOT_FOUND) {
+//            // The product was not found, which may indicate it was already deleted
+//            System.out.println("Product was already deleted or does not exist.");
+//        } else {
+//            // Other HTTP errors
+//            throw e; // Re-throw if it's not a 404 Not Found error
+//        }
+//    }
+//    catch (Exception e) {
+//        // Handle unexpected exceptions
+//        System.err.println("An unexpected error occurred while deleting the product: " + e.getMessage());
+//        throw e; // Re-throw unexpected exceptions
+//    }
+//}
+//-------------------------------------------------------------------------------------
 
 
 

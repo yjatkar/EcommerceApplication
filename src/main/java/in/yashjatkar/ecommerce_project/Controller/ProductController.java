@@ -90,7 +90,12 @@ public class ProductController {
                 id
         );
     }
-
-
+//DELETE A PRODUCT
+//fetch('https://fakestoreapi.com/products/6',
+@DeleteMapping("/{id}")
+    public void deleteProduct(@PathVariable("id") Long id)
+    {
+         productService.deleteProduct(id);
+    }
 }
 
