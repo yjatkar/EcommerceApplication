@@ -1,11 +1,9 @@
 package in.yashjatkar.ecommerce_project.Controller;
 
+import in.yashjatkar.ecommerce_project.Dto.CreateProductDto;
 import in.yashjatkar.ecommerce_project.Model.Product;
 import in.yashjatkar.ecommerce_project.Service.ProductService;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
@@ -30,4 +28,28 @@ public class ProductController {
         return productService.getAllProducts();
     }
 
+    //create a Product
+//    1.we need to take one object to insert data that we give in postman let say-->createObjectDto
+//    {
+//        "id":21,
+//            "title":"Iphone 14",
+//            "price":70000,
+//            "description":"we are adding new column",
+//            "image":"localhost://image.com",
+//            "category":"Electronics"
+//    }
+    @PostMapping()
+    public Product CreateProduct(@RequestBody CreateProductDto requestDto)
+    {
+        return productService.CreateProduct(
+            requestDto.getId(),
+                requestDto.getTitle(),
+                requestDto.getPrice(),
+                requestDto.getDescription(),
+                requestDto.getImage(),
+                requestDto.getCategory()
+
+        );
+
+    }
 }
