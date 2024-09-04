@@ -59,6 +59,16 @@ public class ProductController {
         return productService.getAllCategory();
     }
 
+//    fetch('https://fakestoreapi.com/products/category/jewelery')
+//            .then(res=>res.json())
+//            .then(json=>console.log(json))
+    //get All Products related to Specific Category
+    @GetMapping("/category/{title}")
+    public List<Product> getAllProductsForCategory(@PathVariable("title")
+                                                   String title)
+    {
+        return productService.getAllProductsForCategory(title);
+    }
 
 }
 

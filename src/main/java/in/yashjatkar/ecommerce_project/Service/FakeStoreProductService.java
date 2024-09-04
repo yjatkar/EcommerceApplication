@@ -72,6 +72,22 @@ public List<String> getAllCategory() {
 }
 //-------------------------------------------------------------------------------------------
 
+    public List<Product> getAllProductsForCategory(String title)
+    {
+        List<Product> products=new ArrayList<>();
+        FakeStoreDto[] fakeStoreDtos=
+                restTemplate.getForObject(
+                        "https://fakestoreapi.com/products/category/"+title,
+                        FakeStoreDto[].class
+                );
+        for(FakeStoreDto fakeStoreDto:fakeStoreDtos)
+        {
+            products.add(fakeStoreDto.convertToProduct());
+        }
+        return products;
+
+
+    }
 
 
 
