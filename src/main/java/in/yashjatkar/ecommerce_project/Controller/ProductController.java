@@ -1,6 +1,8 @@
 package in.yashjatkar.ecommerce_project.Controller;
 
 import in.yashjatkar.ecommerce_project.Dto.CreateProductDto;
+import in.yashjatkar.ecommerce_project.Dto.ErrorDto;
+import in.yashjatkar.ecommerce_project.Exception.ProductNotFoundException;
 import in.yashjatkar.ecommerce_project.Model.Product;
 import in.yashjatkar.ecommerce_project.Service.ProductService;
 import org.springframework.http.HttpStatus;
@@ -17,29 +19,39 @@ public class ProductController {
     {
         this.productService=productService;
     }
-    @GetMapping("/{id}")
-    public ResponseEntity<Product> getSingleProduct(@PathVariable("id") Long id)
-    {
+//    -----------------------responseEntity----------------------
+//    @GetMapping("/{id}")
+//    public ResponseEntity<Product> getSingleProduct(@PathVariable("id") Long id)
+//    {
 //        -----------------way 1--------------------------------------
 //       Product product=productService.getSingleProduct(id);
 ////       ResponseEntity<Product> response=new ResponseEntity<>(product,HttpStatus.NOT_FOUND);//status=404
 //        ResponseEntity<Product> response=new ResponseEntity<>(product,HttpStatus.OK);//status=200
 //        return response;
 //        ------------------way2 ----------------------------------
-        try {
-            Product product = productService.getSingleProduct(id);
-
-            if (product != null) {
-                return ResponseEntity.ok(product); // 200 OK
-            } else {
-                return ResponseEntity.notFound().build(); // 404 Not Found
-            }
-        }
-        catch (Exception e) {
-            // Log the exception and return a generic error response
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build(); // 500 Internal Server Error
-        }
+//        try {
+//            Product product = productService.getSingleProduct(id);
+//
+//            if (product != null) {
+//                return ResponseEntity.ok(product); // 200 OK
+//            } else {
+//                return ResponseEntity.notFound().build(); // 404 Not Found
+//            }
+//        }
+//        catch (Exception e) {
+//            // Log the exception and return a generic error response
+//            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build(); // 500 Internal Server Error
+//        }
+//    }
+//    ----------------------------------------------------------------------
+    //get single product
+    @GetMapping("/{id}")
+    public Product getSingleProduct(@PathVariable("id") Long id)
+    throws ProductNotFoundException
+    {
+        return productService.getSingleProduct(id);
     }
+
 
     //get All products
     @GetMapping()
@@ -122,5 +134,13 @@ public class ProductController {
     {
          productService.deleteProduct(id);
     }
+
+//    @ExceptionHandler(ProductNotFoundException.class)
+//    public ResponseEntity<ErrorDto> handleProductNotFoundException(ProductNotFoundException exception)
+//    {
+//        ErrorDto errorDto=new ErrorDto();
+//        errorDto.setMessage(exception.getMessage());
+//        return new ResponseEntity<>(errorDto,HttpStatus.NOT_FOUND);
+//    }
 }
 

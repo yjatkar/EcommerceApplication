@@ -1,12 +1,14 @@
 package in.yashjatkar.ecommerce_project.Service;
 
 import in.yashjatkar.ecommerce_project.Dto.FakeStoreDto;
+import in.yashjatkar.ecommerce_project.Exception.ProductNotFoundException;
 import in.yashjatkar.ecommerce_project.Model.Product;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.client.HttpClientErrorException;
+import org.springframework.web.client.RestClientException;
 import org.springframework.web.client.RestTemplate;
 
 import java.util.ArrayList;
@@ -22,35 +24,44 @@ public class FakeStoreProductService implements ProductService{
             this.restTemplate=restTemplate;
         }
         @Override
-    public Product getSingleProduct(Long id)
-        {
+    public Product getSingleProduct(Long id) throws ProductNotFoundException {
             //to store the response we get from fakestoredto
-      FakeStoreDto fakeStoreDto=
-                restTemplate.getForObject("https://fakestoreapi.com/products/"+id,
-                        FakeStoreDto.class);//convert json response to FakeStoreDto.class
+//      FakeStoreDto fakeStoreDto=
+//                restTemplate.getForObject("https://fakestoreapi.com/products/"+id,
+//                        FakeStoreDto.class);//convert json response to FakeStoreDto.class
+//
+//        return fakeStoreDto.convertToProduct();
+//        }
+//        --------------------------------------------------
+            // Fetch the product from the external API
+            ResponseEntity<FakeStoreDto> response =
+                    restTemplate.getForEntity("https://fakestoreapi.com/products/" + id,
+                            FakeStoreDto.class);//convert json response to FakeStoreDto.class
+            try {
+                // Check if the response status is OK
+                if (response.getStatusCode() == HttpStatus.OK) {
+                    FakeStoreDto fakeStoreDto = response.getBody();
 
-        return fakeStoreDto.convertToProduct();
+                    // Check if the response body is not null
+                    if (fakeStoreDto != null) {
+                        // Convert FakeStoreDto to Product
+                        return fakeStoreDto.convertToProduct();
+                    } else {
+                        // Throw an exception if the product is not found in the response
+                        throw new ProductNotFoundException("Product with id " + id + " does not exist");
+                    }
+                } else {
+                    // Handle unexpected HTTP status codes
+                    throw new ProductNotFoundException("Product with id " + id + " does not exist");
+                }
+            } catch (RestClientException e) {
+                // Handle errors related to REST client communication (e.g., network issues)
+                throw new ProductNotFoundException("Product with id " + id + " does not exist");
+            }
         }
 
-//        --------------------------------------------------
-//        ResponseEntity<FakeStoreDto> response=
-//                restTemplate.getForEntity("https://fakestoreapi.com/products/"+id,
-//                        FakeStoreDto.class);//convert json response to FakeStoreDto.class
-//        try{
-//            if(response.getStatusCode()==HttpStatus.OK)
-//            {
-//                FakeStoreDto fakeStoreDto=response.getBody();
-//                if(fakeStoreDto!=null)
-//                {
-//                    return fakeStoreDto.convertToProduct();
-//                }
-//                else
-//                {
-//                    throw new ResourceNotFoundException("")
-//                }
-//            }
-//        }
-//    }
+
+
 
     @Override
     public List<Product> getAllProducts(){
