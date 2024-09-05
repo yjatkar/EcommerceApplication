@@ -3,6 +3,8 @@ package in.yashjatkar.ecommerce_project.Controller;
 import in.yashjatkar.ecommerce_project.Dto.CreateProductDto;
 import in.yashjatkar.ecommerce_project.Model.Product;
 import in.yashjatkar.ecommerce_project.Service.ProductService;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -16,16 +18,24 @@ public class ProductController {
         this.productService=productService;
     }
     @GetMapping("/{id}")
-    public Product getSingleProduct(@PathVariable("id") Long id)
+    public ResponseEntity<Product> getSingleProduct(@PathVariable("id") Long id)
     {
-        return productService.getSingleProduct(id);
+       Product product=productService.getSingleProduct(id);
+//       ResponseEntity<Product> response=new ResponseEntity<>(product,HttpStatus.NOT_FOUND);//status=404
+        ResponseEntity<Product> response=new ResponseEntity<>(product,HttpStatus.OK);//status=200
+        return response;
     }
 
     //get All products
     @GetMapping()
-    public List<Product> getAllProducts()
+    public ResponseEntity<List<Product>> getAllProducts()
     {
-        return productService.getAllProducts();
+        List<Product> products=productService.getAllProducts();
+        ResponseEntity<List<Product>> response=new ResponseEntity<>(products, HttpStatus.OK);//status=200
+//        ResponseEntity<List<Product>> response=new ResponseEntity<>(products, HttpStatus.NOT_FOUND);//status=404
+        return response;
+        //Returns a 200 OK status with the list of products when
+        // the list is not empty.
     }
 
     //create a Product

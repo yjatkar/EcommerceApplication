@@ -3,6 +3,7 @@ package in.yashjatkar.ecommerce_project.Service;
 import in.yashjatkar.ecommerce_project.Dto.FakeStoreDto;
 import in.yashjatkar.ecommerce_project.Model.Product;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.client.HttpClientErrorException;
@@ -22,13 +23,34 @@ public class FakeStoreProductService implements ProductService{
         }
         @Override
     public Product getSingleProduct(Long id)
-    {
-        //to store the response we get from fakestoredto
-        FakeStoreDto fakeStoreDto=
+        {
+            //to store the response we get from fakestoredto
+      FakeStoreDto fakeStoreDto=
                 restTemplate.getForObject("https://fakestoreapi.com/products/"+id,
                         FakeStoreDto.class);//convert json response to FakeStoreDto.class
+
         return fakeStoreDto.convertToProduct();
-    }
+        }
+
+//        --------------------------------------------------
+//        ResponseEntity<FakeStoreDto> response=
+//                restTemplate.getForEntity("https://fakestoreapi.com/products/"+id,
+//                        FakeStoreDto.class);//convert json response to FakeStoreDto.class
+//        try{
+//            if(response.getStatusCode()==HttpStatus.OK)
+//            {
+//                FakeStoreDto fakeStoreDto=response.getBody();
+//                if(fakeStoreDto!=null)
+//                {
+//                    return fakeStoreDto.convertToProduct();
+//                }
+//                else
+//                {
+//                    throw new ResourceNotFoundException("")
+//                }
+//            }
+//        }
+//    }
 
     @Override
     public List<Product> getAllProducts(){
