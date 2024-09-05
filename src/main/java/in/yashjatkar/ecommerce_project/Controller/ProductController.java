@@ -20,10 +20,25 @@ public class ProductController {
     @GetMapping("/{id}")
     public ResponseEntity<Product> getSingleProduct(@PathVariable("id") Long id)
     {
-       Product product=productService.getSingleProduct(id);
-//       ResponseEntity<Product> response=new ResponseEntity<>(product,HttpStatus.NOT_FOUND);//status=404
-        ResponseEntity<Product> response=new ResponseEntity<>(product,HttpStatus.OK);//status=200
-        return response;
+//        -----------------way 1--------------------------------------
+//       Product product=productService.getSingleProduct(id);
+////       ResponseEntity<Product> response=new ResponseEntity<>(product,HttpStatus.NOT_FOUND);//status=404
+//        ResponseEntity<Product> response=new ResponseEntity<>(product,HttpStatus.OK);//status=200
+//        return response;
+//        ------------------way2 ----------------------------------
+        try {
+            Product product = productService.getSingleProduct(id);
+
+            if (product != null) {
+                return ResponseEntity.ok(product); // 200 OK
+            } else {
+                return ResponseEntity.notFound().build(); // 404 Not Found
+            }
+        }
+        catch (Exception e) {
+            // Log the exception and return a generic error response
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build(); // 500 Internal Server Error
+        }
     }
 
     //get All products
