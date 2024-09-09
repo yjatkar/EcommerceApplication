@@ -1,25 +1,29 @@
 package in.yashjatkar.ecommerce_project.Controller;
 
-import in.yashjatkar.ecommerce_project.Dto.CreateProductDto;
-import in.yashjatkar.ecommerce_project.Dto.ErrorDto;
+import in.yashjatkar.ecommerce_project.Dto.ProductRequestDto;
+import in.yashjatkar.ecommerce_project.Dto.ProductResponseDto;
 import in.yashjatkar.ecommerce_project.Exception.ProductNotFoundException;
 import in.yashjatkar.ecommerce_project.Model.Product;
 import in.yashjatkar.ecommerce_project.Service.ProductService;
+import org.modelmapper.ModelMapper;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.ArrayList;
 import java.util.List;
 
 @RestController//i.e this is not normal controller but take rest requests
 @RequestMapping("/products")
 public class ProductController {
     ProductService productService;
-    public ProductController(ProductService productService)
+    ModelMapper modelMapper;
+    public ProductController(ProductService productService,ModelMapper modelMapper)
     {
         this.productService=productService;
+        this.modelMapper=modelMapper;
     }
-//    -----------------------responseEntity----------------------
+//-----------------------responseEntity-----------------------------------------------
 //    @GetMapping("/{id}")
 //    public ResponseEntity<Product> getSingleProduct(@PathVariable("id") Long id)
 //    {
@@ -43,28 +47,56 @@ public class ProductController {
 //            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build(); // 500 Internal Server Error
 //        }
 //    }
-//    ----------------------------------------------------------------------
-    //get single product
+//--------------------------------------------------------------------------------------
+
+
+//    get single product
     @GetMapping("/{id}")
-    public Product getSingleProduct(@PathVariable("id") Long id)
+    public ProductResponseDto getSingleProduct(@PathVariable("id") Long id)
     throws ProductNotFoundException
     {
-        return productService.getSingleProduct(id);
+        Product product=productService.getSingleProduct(id);
+//        return modelMapper.map(product, ProductResponseDto.class);//added in exception
+        return convertToProductResponseDto(product);
     }
 
 
-    //get All products
+
+//---------------------------------GET ALL PRODUCTS---------------------------------------
+//    get All products
+//    @GetMapping()
+//    public ResponseEntity<List<Product>> getAllProducts()
+//    {
+//        List<Product> products=productService.getAllProducts();
+//        ResponseEntity<List<Product>> response=new ResponseEntity<>(products, HttpStatus.OK);//status=200
+////        ResponseEntity<List<Product>> response=new ResponseEntity<>(products, HttpStatus.NOT_FOUND);//status=404
+//        return response;
+//        //Returns a 200 OK status with the list of products when
+//        // the list is not empty.
+//
+//    }
+
+    //   get All products covert to productResponseDto
     @GetMapping()
-    public ResponseEntity<List<Product>> getAllProducts()
+    public ResponseEntity<List<ProductResponseDto>> getAllProducts()
     {
+        List<ProductResponseDto> productRepsonseDto=new ArrayList<>();
         List<Product> products=productService.getAllProducts();
-        ResponseEntity<List<Product>> response=new ResponseEntity<>(products, HttpStatus.OK);//status=200
+        //covert to productResponseDto
+        for(Product product:products)
+        {
+            productRepsonseDto.add(convertToProductResponseDto((product)));
+        }
+        ResponseEntity<List<ProductResponseDto>> response=new ResponseEntity<>(productRepsonseDto, HttpStatus.OK);//status=200
 //        ResponseEntity<List<Product>> response=new ResponseEntity<>(products, HttpStatus.NOT_FOUND);//status=404
         return response;
-        //Returns a 200 OK status with the list of products when
-        // the list is not empty.
+        //Returns a 200 OK status with the list of products when the list is not empty.
+
     }
 
+
+
+//------------------------CREATE PRODUCT---------------------------------------------------
     //create a Product
 //    1.we need to take one object to insert data that we give in postman let say-->createObjectDto
 //    {
@@ -75,10 +107,27 @@ public class ProductController {
 //            "image":"localhost://image.com",
 //            "category":"Electronics"
 //    }
+//    @PostMapping()
+//    public Product CreateProduct(@RequestBody ProductRequestDto requestDto)
+//    {
+//        //call method from productService--->CreateProduct Method
+//        return productService.CreateProduct(
+//
+//                requestDto.getTitle(),
+//                requestDto.getPrice(),
+//                requestDto.getDescription(),
+//                requestDto.getImage(),
+//                requestDto.getCategory()
+//
+//        );
+//
+//    }
+
     @PostMapping()
-    public Product CreateProduct(@RequestBody CreateProductDto requestDto)
+    public ResponseEntity<ProductResponseDto> CreateProduct(@RequestBody ProductRequestDto requestDto)
     {
-        return productService.CreateProduct(
+        //call method from productService--->CreateProduct Method
+        Product product= productService.CreateProduct(
 
                 requestDto.getTitle(),
                 requestDto.getPrice(),
@@ -87,52 +136,91 @@ public class ProductController {
                 requestDto.getCategory()
 
         );
+        ProductResponseDto productResponseDto=convertToProductResponseDto(product);
+        return new ResponseEntity<>(productResponseDto,HttpStatus.CREATED);//stATUS CODE=201
 
     }
 
+
+//    -------------------------GET ALL CATEGORIES------------------------------------------
     @GetMapping("/categories")
     public List<String> getAllCategory()
     {
         return productService.getAllCategory();
     }
-
+//----------------------------GET ALL PRODUCTS FOR A CATEGORY-------------------------------
 //    fetch('https://fakestoreapi.com/products/category/jewelery')
     //get All Products related to Specific Category
-    @GetMapping("/category/{title}")
-    public List<Product> getAllProductsForCategory(@PathVariable("title")
-                                                   String title)
+    ////way1/////////////////////////////////////////////////
+//    @GetMapping("/category/{title}")
+//    public List<Product> getAllProductsForCategory(@PathVariable("title")
+//                                                   String title)
+//    {
+//        return productService.getAllProductsForCategory(title);
+//    }
+    ///////////way2 using product responsedto
+@GetMapping("/category/{title}")
+public List<ProductResponseDto> getAllProductsForCategory(@PathVariable("title") String title)
+{
+    List<ProductResponseDto> productResponseDto=new ArrayList<>();
+    List<Product> products= productService.getAllProductsForCategory(title);
+    for(Product product:products)
     {
-        return productService.getAllProductsForCategory(title);
+        productResponseDto.add(convertToProductResponseDto(product));
     }
+    return productResponseDto;
+}
 
+
+//    ---------------------UPDATE A PRODUCT------------------------------------------------
 //    Update a product
 //    fetch('https://fakestoreapi.com/products/7')
+    //way 1//////////////////////////////////////
+//    @PatchMapping("/{id}")
+//    public Product updateProduct(@RequestBody ProductRequestDto productRequestDto,
+//                                 @PathVariable("id") Long id)
+//    {
+//        return productService.updateProduct(
+//                productRequestDto.getTitle(),
+//                productRequestDto.getPrice(),
+//                productRequestDto.getDescription(),
+//                productRequestDto.getCategory(),
+//                productRequestDto.getImage(),
+//                id
+//        );
+//    }
+
+    //////////////way2
     @PatchMapping("/{id}")
-    public Product updateProduct(@RequestBody CreateProductDto createProductDto,
+    public ProductResponseDto updateProduct(@RequestBody ProductRequestDto productRequestDto,
                                  @PathVariable("id") Long id)
     {
-//        return productService.updateProduct(
-//                createProductDto.getTitle(),
-//                createProductDto.getPrice(),
-//                createProductDto.getDescription(),
-//                createProductDto.getImage(),
-//                createProductDto.getCategory(),
-//                id);
-        return productService.updateProduct(
-                createProductDto.getTitle(),
-                createProductDto.getPrice(),
-                createProductDto.getDescription(),
-                createProductDto.getCategory(),
-                createProductDto.getImage(),
+        Product product= productService.updateProduct(
+                productRequestDto.getTitle(),
+                productRequestDto.getPrice(),
+                productRequestDto.getDescription(),
+                productRequestDto.getCategory(),
+                productRequestDto.getImage(),
                 id
+
         );
+        return convertToProductResponseDto(product);
     }
+
+//-------------------------DELETE A PRODUCT------------------------------------------------
 //DELETE A PRODUCT
 //fetch('https://fakestoreapi.com/products/6',
 @DeleteMapping("/{id}")
     public void deleteProduct(@PathVariable("id") Long id)
     {
          productService.deleteProduct(id);
+    }
+//-------------------------------------------------------------------------------------------
+    private ProductResponseDto convertToProductResponseDto(Product product){
+        String categoryTitle=product.getCategory().getTitle();
+        ProductResponseDto productResponseDto=modelMapper.map(product, ProductResponseDto.class);
+        productResponseDto.setCategory(categoryTitle);
+        return productResponseDto;
     }
 
 //    @ExceptionHandler(ProductNotFoundException.class)
