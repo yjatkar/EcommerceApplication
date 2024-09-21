@@ -3,6 +3,7 @@ package in.yashjatkar.ecommerce_project.Service;
 import in.yashjatkar.ecommerce_project.Dto.FakeStoreDto;
 import in.yashjatkar.ecommerce_project.Exception.ProductNotFoundException;
 import in.yashjatkar.ecommerce_project.Model.Product;
+import org.springframework.http.HttpMethod;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
@@ -190,9 +191,26 @@ public List<String> getAllCategory() {
         return fakeStoreDto.convertToProduct();
     }
 
-    public void deleteProduct(Long id){
-            restTemplate.delete("https://fakestoreapi.com/products/"+id);
+//    public void deleteProduct(Long id){
+//            restTemplate.delete("https://fakestoreapi.com/products/"+id);
+//
+//    }
 
+    public Product deleteProduct(Long productId)
+            throws ProductNotFoundException {
+        FakeStoreDto fakeStoreDto = restTemplate.exchange(
+                "https://fakestoreapi.com/products/" + productId,
+                HttpMethod.DELETE,
+                null,
+                FakeStoreDto.class
+        ).getBody();
+        if (fakeStoreDto == null) {
+            throw new ProductNotFoundException(
+                    "Product with id " + productId + " not found"
+                            +" try to delete a product with id less than 21");
+        }
+
+        return fakeStoreDto.convertToProduct();
     }
 
 // -------------------DeleteProductUsingException-----------------------------------------------------------

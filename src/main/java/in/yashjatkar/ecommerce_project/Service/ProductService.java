@@ -26,5 +26,5 @@ public List<String> getAllCategory();
                                  String image,
                                  Long id);
 
-    public void deleteProduct(Long id);
+    public Product deleteProduct(Long id) throws ProductNotFoundException;
 }

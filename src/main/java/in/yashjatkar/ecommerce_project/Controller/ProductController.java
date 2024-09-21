@@ -192,8 +192,9 @@ public List<ProductResponseDto> getAllProductsForCategory(@PathVariable("title")
 
     //////////////way2
     @PatchMapping("/{id}")
-    public ProductResponseDto updateProduct(@RequestBody ProductRequestDto productRequestDto,
+    public ResponseEntity<ProductResponseDto> updateProduct(@RequestBody ProductRequestDto productRequestDto,
                                  @PathVariable("id") Long id)
+    throws ProductNotFoundException
     {
         Product product= productService.updateProduct(
                 productRequestDto.getTitle(),
@@ -204,17 +205,33 @@ public List<ProductResponseDto> getAllProductsForCategory(@PathVariable("title")
                 id
 
         );
-        return convertToProductResponseDto(product);
+        ProductResponseDto productResponseDto= convertToProductResponseDto(product);
+        return new ResponseEntity<>(productResponseDto,HttpStatus.OK);
     }
+
+
+
+
 
 //-------------------------DELETE A PRODUCT------------------------------------------------
 //DELETE A PRODUCT
 //fetch('https://fakestoreapi.com/products/6',
-@DeleteMapping("/{id}")
-    public void deleteProduct(@PathVariable("id") Long id)
+//@DeleteMapping("/{id}")
+//    public void deleteProduct(@PathVariable("id") Long id)
+//    {
+//         productService.deleteProduct(id);
+//    }
+
+    @DeleteMapping("/{id}")
+    public ResponseEntity<ProductResponseDto> deleteProduct(@PathVariable("id") Long id)
+            throws ProductNotFoundException
     {
-         productService.deleteProduct(id);
+        Product product=productService.deleteProduct(id);
+        ProductResponseDto productResponseDto=convertToProductResponseDto(product);
+        return new ResponseEntity<>(productResponseDto,HttpStatus.OK);
     }
+
+
 //-------------------------------------------------------------------------------------------
     private ProductResponseDto convertToProductResponseDto(Product product){
         String categoryTitle=product.getCategory().getTitle();
