@@ -6,6 +6,7 @@ import in.yashjatkar.ecommerce_project.Exception.ProductNotFoundException;
 import in.yashjatkar.ecommerce_project.Model.Product;
 import in.yashjatkar.ecommerce_project.Service.ProductService;
 import org.modelmapper.ModelMapper;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -18,7 +19,7 @@ import java.util.List;
 public class ProductController {
     ProductService productService;
     ModelMapper modelMapper;
-    public ProductController(ProductService productService,ModelMapper modelMapper)
+    public ProductController(@Qualifier("selfProductService")ProductService productService, ModelMapper modelMapper)
     {
         this.productService=productService;
         this.modelMapper=modelMapper;
