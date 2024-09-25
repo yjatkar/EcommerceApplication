@@ -4,34 +4,44 @@ import in.yashjatkar.ecommerce_project.Exception.ProductNotFoundException;
 import in.yashjatkar.ecommerce_project.Model.Category;
 import in.yashjatkar.ecommerce_project.Model.Product;
 import in.yashjatkar.ecommerce_project.repository.CategoryRepository;
-import in.yashjatkar.ecommerce_project.repository.ProductRespository;
+import in.yashjatkar.ecommerce_project.repository.ProductRepository;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
 
+import java.util.ArrayList;
 import java.util.List;
 
 @Service("selfProductService")
 public class SelfProductService implements ProductService{
     private RestTemplate restTemplate;
-    private ProductRespository productRespository;
+    private ProductRepository productRepository;
     private CategoryRepository categoryRepository;
-    public SelfProductService(ProductRespository productRespository,
+    public SelfProductService(ProductRepository productRepository,
                               RestTemplate restTemplate,
                               CategoryRepository categoryRepository
                               )
     {
-        this.productRespository=productRespository;
+        this.productRepository = productRepository;
         this.restTemplate=restTemplate;
         this.categoryRepository=categoryRepository;
     }
     @Override
     public Product getSingleProduct(Long id) throws ProductNotFoundException {
-        return null;
+        Product product= productRepository.findProductById(id);
+        if(product==null)
+        {
+            throw new  ProductNotFoundException("product with id "+id+" is not present");
+        }
+        return product;
     }
 
     @Override
     public List<Product> getAllProducts() {
-        return List.of();
+        List<Product> product=productRepository.findAll();
+        return product;
+
+//        or
+//           return productRepository.findAll();
     }
 
     @Override
@@ -56,7 +66,7 @@ public class SelfProductService implements ProductService{
             categoryFromDatabase=newCategory;//no need to save category it is done by persist
         }
         product.setCategory(categoryFromDatabase);
-        Product savedProduct=productRespository.save(product);
+        Product savedProduct= productRepository.save(product);
 
         return savedProduct;
 
@@ -65,21 +75,74 @@ public class SelfProductService implements ProductService{
 
     @Override
     public List<String> getAllCategory() {
-        return List.of();
+        List<Category> categories = categoryRepository.findAll(); // Fetch all categories
+        List<String> categoryNames = new ArrayList<>(); // Create a new list to hold names
+
+        for (Category category : categories) {
+            categoryNames.add(category.getTitle()); // Add each name to the list
+        }
+
+        return categoryNames; // Return the list of names
     }
 
     @Override
     public List<Product> getAllProductsForCategory(String title) {
-        return List.of();
+//        ------------------(1)METHOD-------------------
+            Category cat1=categoryRepository.findByTitle(title);
+            List<Product> product=productRepository.findByCategory(cat1);
+//        ------------------(2)METHOD-------------------
+//        List<Product> product=productRepository.findByCategoryTitle(title);
+        return product;
+
     }
 
     @Override
     public Product updateProduct(String title, Double price, String description, String category, String image, Long id) {
-        return null;
+       Product product=productRepository.findProductById(id);
+       if(title!=null){
+           product.setTitle(title);
+       }
+        if(price!=null){product.setPrice(price);}
+
+        if(description!=null){product.setDescription(description); }
+
+        if(image!=null){product.setImage(image);}
+
+        Category productCategory=new Category();
+        productCategory.setTitle(category);
+        product.setCategory(productCategory);
+        return product;
+
+    }
+
+    @Override
+    public Product replaceProduct(Long id,
+                                  String title,
+                                  Double price,
+                                  String description,
+                                  String category,
+                                  String image)
+            throws ProductNotFoundException
+    {
+        Product product=productRepository.findProductById(id);
+        product.setTitle(title);
+        product.setPrice(price);
+        product.setDescription(description);
+        Category productCategory=new Category();
+        productCategory.setTitle(category);
+        product.setCategory(productCategory);
+        return product;
+//        return null;
     }
 
     @Override
     public Product deleteProduct(Long id) throws ProductNotFoundException {
-        return null;
+        Product product = productRepository.findProductById(id);
+        if (product == null) {
+            throw new ProductNotFoundException("Product with ID " + id + " not found.");
+        }
+
+        productRepository.deleteById(id);
+        return product;
     }
 }

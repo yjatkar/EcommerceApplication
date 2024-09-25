@@ -2,9 +2,9 @@ package in.yashjatkar.ecommerce_project.Service;
 
 import in.yashjatkar.ecommerce_project.Exception.ProductNotFoundException;
 import in.yashjatkar.ecommerce_project.Model.Product;
-import org.springframework.web.bind.annotation.PathVariable;
 
 import java.util.List;
+import java.util.Optional;
 
 
 public interface ProductService {
@@ -25,6 +25,12 @@ public List<String> getAllCategory();
                                  String category,
                                  String image,
                                  Long id);
-
+    public Product replaceProduct(Long id,
+                                  String title,
+                                  Double price,
+                                  String description,
+                                  String category,
+                                  String image)
+            throws ProductNotFoundException;
     public Product deleteProduct(Long id) throws ProductNotFoundException;
 }

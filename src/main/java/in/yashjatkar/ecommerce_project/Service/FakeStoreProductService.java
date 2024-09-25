@@ -3,16 +3,16 @@ package in.yashjatkar.ecommerce_project.Service;
 import in.yashjatkar.ecommerce_project.Dto.FakeStoreDto;
 import in.yashjatkar.ecommerce_project.Exception.ProductNotFoundException;
 import in.yashjatkar.ecommerce_project.Model.Product;
+import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpMethod;
-import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
-import org.springframework.web.client.RestClientException;
 import org.springframework.web.client.RestTemplate;
 
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Optional;
 
 
 @Service("fakeStoreProductService")
@@ -159,6 +159,30 @@ public List<String> getAllCategory() {
 
 
      }
+//     ---------------------------------------------------------------------
+//@Override
+//public Product updateProduct (
+//        Long productId,
+//        String title,
+//        String description,
+//        String image,
+//        String category,
+//        double price)
+//        throws ProductNotFoundException {
+//
+//    FakeStoreDto requestDto = new FakeStoreDto();
+//    requestDto.setTitle(title);
+//    requestDto.setDescription(description);
+//    requestDto.setImage(image);
+//    requestDto.setCategory(category);
+//    requestDto.setPrice(price);
+//
+//    FakeStoreDto response = requestDto;
+//    response.setId(productId);
+//    return response.convertToProduct();
+//}
+
+//    --------------------------------------------------------------------------
     public Product updateProduct(String title,Double price,String description,
                                  String category,String image,Long id)
     {
@@ -190,29 +214,83 @@ public List<String> getAllCategory() {
         }
         return fakeStoreDto.convertToProduct();
     }
+//    ------------------------------replaceProduct---------------------------
+   @Override
+    public Product replaceProduct(Long id,
+                                  String title,
+                                  Double price,
+                                  String description,
+                                  String category,
+                                  String image)
+    throws ProductNotFoundException
+    {
+        FakeStoreDto requestDto = new FakeStoreDto();
+        requestDto.setTitle(title);
+        requestDto.setDescription(description);
+        requestDto.setImage(image);
+        requestDto.setCategory(category);
+        requestDto.setPrice(price);
+
+        // create request entity to send in put request body to fakestore
+        HttpEntity<FakeStoreDto> requestEntity = new HttpEntity<>(requestDto);
+
+        FakeStoreDto response = restTemplate.exchange(
+                "https://fakestoreapi.com/products/" +id,
+                HttpMethod.PUT,
+                requestEntity,//requestbody we need to send to fakeStore
+                FakeStoreDto.class
+        ).getBody();
+
+        if (response == null) {
+            throw new ProductNotFoundException("Product with id " +id + " not found" );
+        }
+        return response.convertToProduct();
+
+    }
+
+
+//    ------------------------------------------------------------------
 
 //    public void deleteProduct(Long id){
 //            restTemplate.delete("https://fakestoreapi.com/products/"+id);
 //
 //    }
+//-----------------------------------------------------------------------------
+//    public Product deleteProduct(Long productId)
+//            throws ProductNotFoundException {
+//        FakeStoreDto fakeStoreDto = restTemplate.exchange(
+//                "https://fakestoreapi.com/products/" + productId,
+//                HttpMethod.DELETE,
+//                null,//no requestbody need to send to fakeStore id is sufficent to delete
+//                FakeStoreDto.class
+//        ).getBody();
+//        if (fakeStoreDto == null) {
+//            throw new ProductNotFoundException(
+//                    "Product with id " + productId + " not found"
+//                            +" try to delete a product with id less than 21");
+//        }
+//
+//        return fakeStoreDto.convertToProduct();
+//    }
+//    ----------------------------delete---------------------------------------------
+public Product deleteProduct(Long productId)
+        throws ProductNotFoundException {
+    ResponseEntity<FakeStoreDto> responseEntity=restTemplate.exchange(
+            "https://fakestoreapi.com/products/" + productId,
+            HttpMethod.DELETE,
+            null,//no requestbody need to send to fakeStore id is sufficent to delete
+            FakeStoreDto.class
+    );
 
-    public Product deleteProduct(Long productId)
-            throws ProductNotFoundException {
-        FakeStoreDto fakeStoreDto = restTemplate.exchange(
-                "https://fakestoreapi.com/products/" + productId,
-                HttpMethod.DELETE,
-                null,
-                FakeStoreDto.class
-        ).getBody();
-        if (fakeStoreDto == null) {
-            throw new ProductNotFoundException(
-                    "Product with id " + productId + " not found"
-                            +" try to delete a product with id less than 21");
-        }
-
-        return fakeStoreDto.convertToProduct();
+    FakeStoreDto fakeStoreDto=responseEntity.getBody();
+    if (fakeStoreDto == null) {
+        throw new ProductNotFoundException(
+                "Product with id " + productId + " not found"
+                        +" try to delete a product with id less than 21");
     }
 
+    return fakeStoreDto.convertToProduct();
+}
 // -------------------DeleteProductUsingException-----------------------------------------------------------
 //public void deleteProduct(Long id) {
 //    // URL to access the product

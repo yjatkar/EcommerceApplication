@@ -210,9 +210,24 @@ public List<ProductResponseDto> getAllProductsForCategory(@PathVariable("title")
         return new ResponseEntity<>(productResponseDto,HttpStatus.OK);
     }
 
+//----------------------  Replace A Product-----------------------------------
 
+    @PutMapping("/{id}")
+    public ResponseEntity<ProductResponseDto> replaceProduct(@PathVariable("id") Long id,
+                                  @RequestBody ProductRequestDto productRequestDto)
+        throws ProductNotFoundException{
+        Product product=productService.replaceProduct(
+                id,
+                productRequestDto.getTitle(),
+                productRequestDto.getPrice(),
+                productRequestDto.getDescription(),
+                productRequestDto.getCategory(),
+                productRequestDto.getImage()
+        );
+        ProductResponseDto productResponseDto = convertToProductResponseDto(product);
+        return new ResponseEntity<>(productResponseDto, HttpStatus.OK);
 
-
+    }
 
 //-------------------------DELETE A PRODUCT------------------------------------------------
 //DELETE A PRODUCT
